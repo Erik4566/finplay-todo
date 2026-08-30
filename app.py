@@ -54,34 +54,50 @@ def login_screen() -> None:
         st.info("Beží lokálny režim — dáta zostávajú v tomto počítači. "
                 "Vytvor si účet nižšie.")
 
-    tab_login, tab_signup = st.tabs(["Prihlásenie", "Nový účet"])
+    # Zámerne NIE st.tabs: Streamlit po každom odoslaní formulára prepne
+    # záložky späť na prvú, takže po neúspešnom pokuse používateľ nevidí,
+    # kde vlastne je. Voľba držaná v session_state prepnutie prežije.
+    mode = st.radio(
+        "Čo chceš urobiť", ["signup", "login"],
+        format_func=lambda m: ("Vytvoriť nový účet" if m == "signup"
+                               else "Prihlásiť sa (účet už mám)"),
+        key="auth_mode", horizontal=False, label_visibility="collapsed")
 
-    with tab_login:
-        with st.form("login_form"):
-            email = st.text_input("E-mail", placeholder="ty@firma.sk")
-            password = st.text_input("Heslo", type="password")
-            if st.form_submit_button("Prihlásiť sa", type="primary",
-                                     use_container_width=True):
-                ok, message = auth.sign_in(email, password)
-                if ok:
-                    st.rerun()
-                else:
-                    st.error(message)
+    if mode == "signup":
+        _signup_form()
+    else:
+        _login_form()
 
-    with tab_signup:
-        with st.form("signup_form"):
-            full_name = st.text_input("Meno a priezvisko")
-            email = st.text_input("E-mail", key="signup_email", placeholder="ty@firma.sk")
-            password = st.text_input("Heslo (min. 8 znakov)", type="password",
-                                     key="signup_password")
-            if st.form_submit_button("Vytvoriť účet", type="primary",
-                                     use_container_width=True):
-                ok, message = auth.sign_up(email, password, full_name)
-                if ok:
-                    st.success(message)
-                    st.rerun()
-                else:
-                    st.error(message)
+
+def _signup_form() -> None:
+    with st.form("signup_form"):
+        st.markdown("#### Nový účet")
+        full_name = st.text_input("Meno a priezvisko")
+        email = st.text_input("E-mail", key="signup_email", placeholder="ty@firma.sk")
+        password = st.text_input("Heslo (min. 8 znakov)", type="password",
+                                 key="signup_password")
+        if st.form_submit_button("Vytvoriť účet", type="primary",
+                                 use_container_width=True):
+            ok, message = auth.sign_up(email, password, full_name)
+            if ok:
+                st.success(message)
+                st.rerun()
+            else:
+                st.error(message)
+
+
+def _login_form() -> None:
+    with st.form("login_form"):
+        st.markdown("#### Prihlásenie")
+        email = st.text_input("E-mail", placeholder="ty@firma.sk")
+        password = st.text_input("Heslo", type="password")
+        if st.form_submit_button("Prihlásiť sa", type="primary",
+                                 use_container_width=True):
+            ok, message = auth.sign_in(email, password)
+            if ok:
+                st.rerun()
+            else:
+                st.error(message)
 
 
 # =============================================================================

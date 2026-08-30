@@ -85,6 +85,14 @@ def sign_up(email: str, password: str, full_name: str) -> tuple[bool, str]:
                 "options": {"data": {"full_name": full_name}},
             })
         except Exception as exc:
+            text = str(exc).lower()
+            if "already registered" in text:
+                return False, ("Účet s týmto e-mailom už existuje — prepni sa na "
+                               "záložku **Prihlásenie**.")
+            if "password" in text and "least" in text:
+                return False, "Heslo je príliš krátke — použi aspoň 8 znakov."
+            if "invalid format" in text or "validate email" in text:
+                return False, "E-mail nemá platný tvar."
             return False, f"Registrácia zlyhala: {exc}"
         if res.session is None:
             return True, ("Účet vytvorený. Skontroluj e-mail a potvrď registráciu, "
@@ -119,9 +127,17 @@ def sign_in(email: str, password: str) -> tuple[bool, str]:
         try:
             res = client.auth.sign_in_with_password({"email": email, "password": password})
         except Exception as exc:
+            # Supabase zámerne nerozlišuje "zlé heslo" od "účet neexistuje",
+            # aby sa nedalo zisťovať, kto je registrovaný. Používateľ tak ale
+            # nevie, že si má najskôr vytvoriť účet - povieme mu to my.
+            if "invalid login credentials" in str(exc).lower():
+                return False, ("Nesprávny e-mail alebo heslo — a ak si účet ešte "
+                               "nevytvoril, sprav to cez záložku **Nový účet** vyššie. "
+                               "Účet z lokálneho režimu sa do cloudu neprenáša.")
             return False, f"Prihlásenie zlyhalo: {exc}"
         if res.session is None:
-            return False, "Nesprávny e-mail alebo heslo."
+            return False, ("Nesprávny e-mail alebo heslo — alebo účet ešte "
+                           "neexistuje. Skús záložku **Nový účet**.")
         _store_supabase_session(res)
         return True, "Prihlásený."
 

@@ -513,6 +513,14 @@ div[class*="st-key-more-"] button svg {{ display: none !important; }}
 }}
 
 /* ---------- prihlásenie ---------- */
+/* voľba účet/prihlásenie ako dve veľké tlačidlá, nie drobné rádio */
+.stRadio [role="radiogroup"] {{ gap: .5rem !important; }}
+.stRadio [role="radiogroup"] label {{
+  border: 1px solid var(--fp-line); border-radius: var(--fp-radius);
+  padding: .7rem .9rem; background: var(--fp-card); width: 100%;
+  min-height: var(--fp-tap); align-items: center;
+}}
+.stRadio [role="radiogroup"] label:hover {{ border-color: var(--fp-accent); }}
 .fp-login-logo {{ font-size: 3rem; line-height: 1; margin-bottom: .3rem; }}
 .fp-login-title {{ font-size: 2.1rem; font-weight: 780; letter-spacing: -.03em; }}
 </style>
