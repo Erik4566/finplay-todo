@@ -7,6 +7,7 @@ chýbajúca sekcia znamená, že daná funkcia beží v lokálnom / mock režime
 from __future__ import annotations
 
 import os
+from collections.abc import Mapping
 from typing import Any
 
 try:  # streamlit nemusí byť dostupný pri importe z testov
@@ -26,20 +27,26 @@ def _secrets() -> dict:
 
 
 def section(name: str) -> dict:
-    """Vráti sekciu zo secrets (podporuje aj bodkovú notáciu: 'ai.gemini')."""
+    """Vráti sekciu zo secrets (podporuje aj bodkovú notáciu: 'ai.gemini').
+
+    Pozor na typy: Streamlit vracia vnorené sekcie ako ``AttrDict``, ktorý
+    NIE JE potomkom ``dict`` — je to len ``Mapping``. Kontrola cez
+    ``isinstance(data, dict)`` preto ticho zlyhá a appka sa tvári, že
+    konfigurácia neexistuje. Testuje sa proti ``Mapping``.
+    """
     data: Any = _secrets()
     for part in name.split("."):
-        if not isinstance(data, dict) or part not in data:
+        if not isinstance(data, Mapping) or part not in data:
             return {}
         data = data[part]
-    return dict(data) if isinstance(data, dict) else {}
+    return dict(data) if isinstance(data, Mapping) else {}
 
 
 def get(path: str, env: str | None = None, default: Any = None) -> Any:
     """Hodnota zo secrets ('smtp.host') s fallbackom na premennú prostredia."""
     *parts, key = path.split(".")
     data = section(".".join(parts)) if parts else _secrets()
-    value = data.get(key) if isinstance(data, dict) else None
+    value = data.get(key) if isinstance(data, Mapping) else None
     if value in (None, ""):
         value = os.environ.get(env) if env else None
     return default if value in (None, "") else value
