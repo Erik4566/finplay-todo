@@ -1,0 +1,5 @@
+{
+  "_zdroj": "PRÁZDNE ZÁMERNE. V Česku neexistuje oficiálny kalendár mien - nepôsobí tam kalendárová komisia ani iná inštitúcia, ktorá by mená k dňom prideľovala, a každé vydavateľstvo kalendárov si ich určuje samo (zdroj: Ústav pro jazyk český AV ČR). Preto sem nedávam zoznam z neoveriteľného zdroja. Ak chceš české meniny zobrazovať, doplň polia nižšie rovnakým spôsobom ako v meniny_sk.json: kľúč je mesiac ('01'-'12'), hodnota pole mien pre 1. az posledny den mesiaca. Appka prazdny zoznam ticho preskoci.",
+  "01": [], "02": [], "03": [], "04": [], "05": [], "06": [],
+  "07": [], "08": [], "09": [], "10": [], "11": [], "12": []
+}

@@ -1,0 +1,23 @@
+# --- jadro ---
+streamlit>=1.40
+python-dateutil>=2.9
+requests>=2.32
+
+# --- databáza / auth ---
+supabase>=2.9.0
+
+# --- AI modely (voliteľné, appka beží aj bez nich v mock režime) ---
+anthropic>=0.40.0
+google-genai>=1.0.0
+openai>=1.50.0
+
+# --- Google Calendar (voliteľné) ---
+google-auth>=2.35.0
+google-auth-oauthlib>=1.2.0
+google-api-python-client>=2.150.0
+
+# --- Microsoft To Do / Graph (voliteľné) ---
+msal>=1.31.0
+
+# --- aktualizácia kalendára mien z oficiálneho PDF (tools/update_calendar.py) ---
+pypdf>=5.0.0
