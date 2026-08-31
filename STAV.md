@@ -11,6 +11,26 @@ odpoveď na otázku „kde sme skončili a prečo je to spravené takto".
 > po zhrnutí kontextu prežije „čo", vytratí sa „prečo" — a to je pri návrate
 > najdrahšie.
 
+> **Pravidlo:** naraz sa rieši **jedna téma** a dotiahne sa do konca. Nové
+> nápady nejdú do práce, ale do „Otvorených slučiek" nižšie. Odbočiť sa smie
+> len vtedy, keď by bez toho rozrobená vec nedopadla — a hneď po odbočke sa
+> treba vrátiť.
+
+---
+
+## Otvorené slučky
+
+Čo je rozrobené alebo sľúbené a ešte nedokončené. Tento zoznam sa udržiava
+priebežne — nič sa nesmie stratiť len preto, že prišla nová téma.
+
+| Čo | Stav | Čaká na |
+|---|---|---|
+| Prečítať 2 spätné väzby od používateľa | otvorené | export z appky (`.zip`) |
+| Gemini kľúč → skutočná AI analýza | navrhnuté | rozhodnutie používateľa |
+| Hlasové zadávanie úloh | navrhnuté | Gemini kľúč |
+| Upozornenia pri zavretej appke | odložené | SMTP |
+| Reálne používanie appky | otvorené | — |
+
 ---
 
 ## Kde to beží
