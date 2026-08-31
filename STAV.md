@@ -5,6 +5,12 @@ odpoveď na otázku „kde sme skončili a prečo je to spravené takto".
 
 **Posledná aktualizácia:** 31. 8. 2026
 
+> **Pravidlo:** tento súbor sa aktualizuje **po každej uzavretej veci** —
+> dokončená funkcia, opravená chyba, prijaté rozhodnutie, míľnik, alebo
+> zistenie, že sa niečo nedá. Nie po každom kroku. Vždy aj s **dôvodom**:
+> po zhrnutí kontextu prežije „čo", vytratí sa „prečo" — a to je pri návrate
+> najdrahšie.
+
 ---
 
 ## Kde to beží
