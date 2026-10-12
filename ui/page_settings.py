@@ -325,6 +325,30 @@ def _health() -> None:
         cols[2].markdown(icons.html(icons.CHECK if ok else icons.DEMO),
                          unsafe_allow_html=True)
 
+    theme.section("Voliteľné knižnice")
+    st.markdown('<div class="fp-muted">Nasadená appka ich zámerne neinštaluje — '
+                'predlžovali by prebúdzanie. Keď niektorú funkciu začneme naozaj '
+                'používať, presunie sa do requirements.txt.</div>',
+                unsafe_allow_html=True)
+
+    import importlib.util
+    optional = [
+        ("google.genai", "Gemini", "AI analýza, hlasový vstup"),
+        ("anthropic", "Claude", "AI analýza"),
+        ("openai", "GPT", "AI analýza"),
+        ("googleapiclient", "Google Calendar", "synchronizácia udalostí"),
+        ("msal", "Microsoft To Do", "synchronizácia úloh"),
+        ("pypdf", "pypdf", "aktualizácia kalendára mien (len lokálne)"),
+    ]
+    for module, label, purpose in optional:
+        present = importlib.util.find_spec(module.split(".")[0]) is not None
+        cols = st.columns([3, 4, 1])
+        cols[0].markdown(f"**{label}**")
+        cols[1].markdown(f'<span class="fp-muted">{esc(purpose)}</span>',
+                         unsafe_allow_html=True)
+        cols[2].markdown(icons.html(icons.CHECK if present else icons.CLOSE),
+                         unsafe_allow_html=True)
+
     if backend.kind != "supabase":
         st.markdown('<hr class="fp-divider">', unsafe_allow_html=True)
         st.info("Beží lokálna databáza. Na prepnutie na Supabase spusti `sql/schema.sql` "

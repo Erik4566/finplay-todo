@@ -1,0 +1,31 @@
+# =============================================================================
+#  Voliteľné knižnice — appka bez nich beží, len príslušná funkcia je vypnutá.
+#
+#  V kóde sa importujú až vnútri funkcií, takže ich chýbanie nič nezhodí.
+#  Appka to oznámi v Nastavenia → Stav systému.
+#
+#  Lokálna inštalácia všetkého naraz:
+#      pip install -r requirements.txt -r requirements-optional.txt
+#
+#  Na nasadenej appke (Streamlit Cloud) ich NEINŠTALUJEME automaticky —
+#  predlžovali by prebúdzanie o minúty. Keď niektorú funkciu začneme naozaj
+#  používať, presunie sa príslušný riadok do requirements.txt.
+#  Veľkosti sú namerané, nie odhadnuté.
+# =============================================================================
+
+# --- AI modely: analýza rizík, rozklad na kroky, (plánovane) hlasový vstup ---
+google-genai>=1.0.0          #  9 MB — Gemini; prvý na presun, keď bude kľúč
+anthropic>=0.40.0            #  7 MB — Claude
+openai>=1.50.0               # 11 MB — GPT
+
+# --- Google Calendar ---------------------------------------------------------
+google-api-python-client>=2.150.0   # 100 MB (!) — zďaleka najväčšia závislosť
+google-auth>=2.35.0
+google-auth-oauthlib>=1.2.0
+
+# --- Microsoft To Do ---------------------------------------------------------
+msal>=1.31.0                 # 0,8 MB
+
+# --- Nástroj na aktualizáciu kalendára mien (tools/update_calendar.py) --------
+# Potrebné len lokálne, na nasadenej appke nikdy.
+pypdf>=5.0.0                 # 3,5 MB

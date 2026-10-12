@@ -30,6 +30,7 @@ priebežne — nič sa nesmie stratiť len preto, že prišla nová téma.
 | Hlasové zadávanie úloh | navrhnuté | Gemini kľúč |
 | Upozornenia pri zavretej appke | odložené | SMTP |
 | Reálne používanie appky | otvorené | — |
+| Odolnosť pri vypršanej relácii Supabase | zistené, neriešené | — |
 
 ---
 
@@ -113,7 +114,12 @@ by rozbilo iný rozrobený projekt.
 3. **Deadlock v lokálnom backende** — `delete()` volal `_load()` zvnútra
    zamknutej sekcie s neresentrantným zámkom. Appka zamrzla.
 
-4. **Tlačidlá s nápovedou majú v DOM skrytý duplikát.** Automatické testy
+4. **Obyčajný HTTP ping nasadenú appku nezobudí.** Zmerané: na `/_stcore/health`
+   aj na hlavnú adresu vracia `303` a appka spí ďalej. Prebudí ju až skutočná
+   relácia cez websocket. Pingovacie služby (UptimeRobot a spol.) sú teda na
+   tento účel nepoužiteľné — preto beží GitHub Actions s headless prehliadačom.
+
+5. **Tlačidlá s nápovedou majú v DOM skrytý duplikát.** Automatické testy
    klikali a merali ten neviditeľný. Pri hľadaní elementov filtrovať cez
    `offsetParent !== null` alebo `:visible`.
 
@@ -132,6 +138,11 @@ Nedoriešené: či robiť len prepis do políčok, alebo celý rozbor.
 **Neriešené obmedzenie:** upozornenia sa vyhodnocujú pri načítaní stránky —
 keď je appka zavretá, nič nepríde. Riešiteľné naplánovanou úlohou, ktorá raz
 za hodinu spustí rozposielanie. Má zmysel až po nastavení SMTP.
+
+**Zistené pri trimovaní závislostí (neriešené):** volania do Supabase nie sú
+ošetrené proti výnimkám. Keď relácia vyprší alebo príde neplatná hodnota,
+PostgREST vyhodí `APIError` a obrazovka spadne namiesto zrozumiteľnej hlášky.
+Prejavilo sa to v testoch, keď fiktívne `id` používateľa nebolo platné UUID.
 
 **Nepoužité:** appka zatiaľ neobsahuje ani jednu reálnu úlohu. Než sa pridá
 čokoľvek ďalšie, má sa pár dní používať.

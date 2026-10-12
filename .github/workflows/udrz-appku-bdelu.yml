@@ -1,0 +1,68 @@
+# =============================================================================
+#  Udržiava nasadenú appku bdelú.
+#
+#  Streamlit Community Cloud appku po čase nečinnosti uspí a prebudenie trvá
+#  aj dve minúty — čo je pri nástroji na rýchle zachytenie úlohy zabijak.
+#
+#  Obyčajný HTTP ping NESTAČÍ: overené meraním, appka naň vráti 303 a ďalej
+#  spí. Prebudí ju až skutočná relácia cez websocket, teda otvorenie
+#  v prehliadači. Preto tu beží headless Chromium, nie curl.
+#
+#  Repozitár je verejný, takže minúty GitHub Actions sú zadarmo.
+# =============================================================================
+
+name: Udrž appku bdelú
+
+on:
+  schedule:
+    # Každých 30 minút. GitHub plánovač je orientačný a býva oneskorený
+    # o 5-15 minút, čo pri tomto účele nevadí.
+    - cron: "*/30 * * * *"
+  workflow_dispatch:        # umožní spustiť ručne z karty Actions
+
+concurrency:
+  group: keep-awake
+  cancel-in-progress: true
+
+jobs:
+  navstiv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Nainštaluj Playwright
+        run: |
+          pip install --quiet playwright
+          playwright install --with-deps chromium
+
+      - name: Otvor appku a počkaj, kým sa načíta
+        run: |
+          python - <<'PY'
+          import sys, time
+          from playwright.sync_api import sync_playwright
+
+          URL = "https://finplay-ulohy.streamlit.app"
+
+          with sync_playwright() as pw:
+              browser = pw.chromium.launch()
+              page = browser.new_page()
+              start = time.time()
+              page.goto(URL, wait_until="domcontentloaded", timeout=120_000)
+
+              # Čakáme na skutočný obsah, nie len na prázdnu stránku —
+              # appka sa môže práve prebúdzať.
+              for _ in range(30):
+                  page.wait_for_timeout(5_000)
+                  if "FinPlay ToDo" in page.content():
+                      print(f"appka odpovedá po {time.time() - start:.0f} s")
+                      browser.close()
+                      sys.exit(0)
+
+              print(f"appka sa nenačítala ani po {time.time() - start:.0f} s")
+              print(page.content()[:500])
+              browser.close()
+              sys.exit(1)
+          PY
