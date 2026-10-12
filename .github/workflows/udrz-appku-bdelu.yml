@@ -1,13 +1,16 @@
 # =============================================================================
 #  Udržiava nasadenú appku bdelú.
 #
-#  Streamlit Community Cloud appku po čase nečinnosti uspí a prebudenie trvá
-#  aj dve minúty — čo je pri nástroji na rýchle zachytenie úlohy zabijak.
+#  Streamlit Community Cloud appku po čase nečinnosti uspí. Prebudenie trvá
+#  minúty, čo je pri nástroji na rýchle zachytenie úlohy zabijak.
 #
-#  Obyčajný HTTP ping NESTAČÍ: overené meraním, appka naň vráti 303 a ďalej
-#  spí. Prebudí ju až skutočná relácia cez websocket, teda otvorenie
-#  v prehliadači. Preto tu beží headless Chromium, nie curl.
+#  Dve veci zmerané, nie odhadnuté:
+#   1) Obyčajný HTTP ping NESTAČÍ — na hlavnú adresu aj na /_stcore/health
+#      vracia 303 a appka spí ďalej. Pingovacie služby sú tu nepoužiteľné.
+#   2) Appka sa nezobudí ani len otvorením v prehliadači — zobrazí obrazovku
+#      „Zzzz" s tlačidlom „Yes, get this app back up!" a čaká na KLIKNUTIE.
 #
+#  Preto tu beží headless Chromium, ktorý to tlačidlo aj stlačí.
 #  Repozitár je verejný, takže minúty GitHub Actions sú zadarmo.
 # =============================================================================
 
@@ -27,7 +30,7 @@ concurrency:
 jobs:
   navstiv:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - uses: actions/setup-python@v5
         with:
@@ -38,31 +41,45 @@ jobs:
           pip install --quiet playwright
           playwright install --with-deps chromium
 
-      - name: Otvor appku a počkaj, kým sa načíta
+      - name: Otvor appku, v prípade potreby ju zobuď
         run: |
           python - <<'PY'
           import sys, time
           from playwright.sync_api import sync_playwright
 
           URL = "https://finplay-ulohy.streamlit.app"
+          HOTOVO = "FinPlay ToDo"
+          SPI = "get this app back up"
+
+          def stav(page):
+              html = page.content()
+              if HOTOVO in html:
+                  return "bdela"
+              if SPI in html:
+                  return "spi"
+              return "prebuduje"
 
           with sync_playwright() as pw:
               browser = pw.chromium.launch()
               page = browser.new_page()
               start = time.time()
               page.goto(URL, wait_until="domcontentloaded", timeout=120_000)
+              page.wait_for_timeout(10_000)
 
-              # Čakáme na skutočný obsah, nie len na prázdnu stránku —
-              # appka sa môže práve prebúdzať.
-              for _ in range(30):
+              if stav(page) == "spi":
+                  print("appka spala, klikám na prebudenie")
+                  page.get_by_role("button", name="Yes, get this app back up!").click()
+
+              # Prebudenie trvá aj niekoľko minút — čakáme trpezlivo.
+              for _ in range(48):
                   page.wait_for_timeout(5_000)
-                  if "FinPlay ToDo" in page.content():
+                  if stav(page) == "bdela":
                       print(f"appka odpovedá po {time.time() - start:.0f} s")
                       browser.close()
                       sys.exit(0)
 
               print(f"appka sa nenačítala ani po {time.time() - start:.0f} s")
-              print(page.content()[:500])
+              print(page.content()[:600])
               browser.close()
               sys.exit(1)
           PY

@@ -114,12 +114,17 @@ by rozbilo iný rozrobený projekt.
 3. **Deadlock v lokálnom backende** — `delete()` volal `_load()` zvnútra
    zamknutej sekcie s neresentrantným zámkom. Appka zamrzla.
 
-4. **Obyčajný HTTP ping nasadenú appku nezobudí.** Zmerané: na `/_stcore/health`
+4. **Nasadená appka sa nezobudí sama.** Zmerané: po nečinnosti zobrazí
+   obrazovku „Zzzz" s tlačidlom *Yes, get this app back up!* a čaká na
+   **kliknutie**. Samotné otvorenie stránky nestačí — prvá verzia workflowu
+   preto nebola funkčná a musela tlačidlo začať klikať.
+
+5. **Obyčajný HTTP ping nasadenú appku nezobudí.** Zmerané: na `/_stcore/health`
    aj na hlavnú adresu vracia `303` a appka spí ďalej. Prebudí ju až skutočná
    relácia cez websocket. Pingovacie služby (UptimeRobot a spol.) sú teda na
    tento účel nepoužiteľné — preto beží GitHub Actions s headless prehliadačom.
 
-5. **Tlačidlá s nápovedou majú v DOM skrytý duplikát.** Automatické testy
+6. **Tlačidlá s nápovedou majú v DOM skrytý duplikát.** Automatické testy
    klikali a merali ten neviditeľný. Pri hľadaní elementov filtrovať cez
    `offsetParent !== null` alebo `:visible`.
 
